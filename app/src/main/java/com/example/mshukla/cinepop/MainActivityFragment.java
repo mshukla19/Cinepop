@@ -40,6 +40,7 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
     MoviesAdapter moviesAdapter;
     private List<Movie> movies;
     private int actualWidth;
+    private String mSortCriteria;
     public MainActivityFragment() {
     }
 
@@ -63,8 +64,7 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
     }
 
     private void loadMovies() {
-        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String mSortCriteria = preferences.getString(Constants.SORT_CRITERIA,Constants.SORT_BY_POPULARITY);
+        setSortCriteria();
         Call<MovieResults> movieResultsCall = RestClient.getApiService().getMovieResults(BuildConfig.API_KEY, mSortCriteria);
         movieResultsCall.enqueue(new Callback<MovieResults>() {
             @Override
@@ -109,5 +109,13 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
         editor.commit();
         loadMovies();
         return super.onOptionsItemSelected(item);
+    }
+
+    public String setSortCriteria() {
+        SharedPreferences preferences = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String sortCriteria = preferences.getString(Constants.SORT_CRITERIA,Constants.SORT_BY_POPULARITY);
+        if(mSortCriteria != sortCriteria)
+            mSortCriteria = sortCriteria;
+        return mSortCriteria;
     }
 }
