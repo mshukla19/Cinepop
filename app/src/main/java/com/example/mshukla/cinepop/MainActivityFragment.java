@@ -87,7 +87,7 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
         if(position == RecyclerView.NO_POSITION)
             return;
         Movie selectedMovie = movies.get(position);
-        Intent intent = new Intent(getContext(),MovieDetails.class);
+        Intent intent = new Intent(getContext(),MovieDetail.class);
         //http://stackoverflow.com/questions/3323074/android-difference-between-parcelable-and-serializable
         intent.putExtra(Constants.MOVIE_BUNDLE_KEY,selectedMovie);
         startActivity(intent);
