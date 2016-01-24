@@ -48,7 +48,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        String url = Constants.IMAGE_URL + mDataset.get(position).getPosterPath();
+        holder.attachMovie(mDataset.get(position));
+        String url = Constants.IMAGE_URL + holder.movie.getPosterPath();
         Glide.with(mContext)
                 .load(url)
                 .crossFade()
@@ -67,6 +68,8 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
         ImageView mImageView;
         private final ClickListener mOnclickListener;
 
+        private Movie movie;
+
         public ViewHolder(View itemView, ClickListener OnclickListener) {
             super(itemView);
             itemView.setOnClickListener(this);
@@ -74,14 +77,18 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
             ButterKnife.bind(this, itemView);
         }
 
+        public void attachMovie(Movie movie) {
+            this.movie = movie;
+        }
+
 
         @Override
         public void onClick(View view) {
-            mOnclickListener.moviePosterClick(itemView);
+            mOnclickListener.moviePosterClick(itemView, movie);
         }
 
         public interface ClickListener {
-            void moviePosterClick(View itemView);
+            void moviePosterClick(View itemView, Movie movie);
         }
     }
 }
