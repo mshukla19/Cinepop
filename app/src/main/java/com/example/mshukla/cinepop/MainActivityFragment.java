@@ -1,24 +1,23 @@
 package com.example.mshukla.cinepop;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 
 import com.example.mshukla.cinepop.Adapter.MoviesAdapter;
 import com.example.mshukla.cinepop.Api.RestClient;
 import com.example.mshukla.cinepop.Model.Movie;
-
 import com.example.mshukla.cinepop.Model.MovieResults;
 import com.example.mshukla.cinepop.Util.Constants;
-import com.example.mshukla.cinepop.Util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ import retrofit.Retrofit;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements MoviesAdapter.ViewHolder.ClickListener {
+public class MainActivityFragment extends Fragment {
 
     @Bind(R.id.movie_grid_view)
     RecyclerView mMoviesGrid;
@@ -47,25 +46,47 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        final View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
         mMoviesGrid.setHasFixedSize(true);
         setHasOptionsMenu(true);
-        int screenWidth = Util.getScreenWidth(getContext());
-        int spanCount = screenWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
-        actualWidth = screenWidth / spanCount;
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(),spanCount);
-        mMoviesGrid.setLayoutManager(mLayoutManager);
-        movies = new ArrayList<>();
-        moviesAdapter = new MoviesAdapter(getContext(), movies, actualWidth, this );
-        mMoviesGrid.setAdapter(moviesAdapter);
-        loadMovies();
+
+        // dont calculate width before layout is laid out otherwise it returns 0
+        // follow this for more details http://stackoverflow.com/questions/3591784/getwidth-and-getheight-of-view-returns-0
+
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressLint("NewApi")
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onGlobalLayout() {
+                // Ensure you call it only once :
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN) {
+                    view.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                } else {
+                    view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                }
+                int gridWidth = mMoviesGrid.getWidth();
+                int spanCount = gridWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
+                actualWidth = gridWidth / spanCount;
+                RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), spanCount);
+                mMoviesGrid.setLayoutManager(mLayoutManager);
+                movies = new ArrayList<>();
+
+                moviesAdapter = new MoviesAdapter(getContext(), movies, actualWidth,
+                        (MoviesAdapter.ViewHolder.ClickListener) getActivity());
+
+                mMoviesGrid.setAdapter(moviesAdapter);
+                loadMovies();
+            }
+        });
+
         return view;
     }
 
     private void loadMovies() {
         setSortCriteria();
-        Call<MovieResults> movieResultsCall = RestClient.getApiService().getMovieResults(BuildConfig.API_KEY, mSortCriteria);
+        Call<MovieResults> movieResultsCall = RestClient.getApiService().
+                getMovieResults(BuildConfig.API_KEY, mSortCriteria);
         movieResultsCall.enqueue(new Callback<MovieResults>() {
             @Override
             public void onResponse(Response<MovieResults> response, Retrofit retrofit) {
@@ -81,17 +102,7 @@ public class MainActivityFragment extends Fragment implements MoviesAdapter.View
         });
     }
 
-    @Override
-    public void moviePosterClick(View itemView) {
-        int position = mMoviesGrid.getChildLayoutPosition(itemView);
-        if(position == RecyclerView.NO_POSITION)
-            return;
-        Movie selectedMovie = movies.get(position);
-        Intent intent = new Intent(getContext(),MovieDetail.class);
-        //http://stackoverflow.com/questions/3323074/android-difference-between-parcelable-and-serializable
-        intent.putExtra(Constants.MOVIE_BUNDLE_KEY,selectedMovie);
-        startActivity(intent);
-    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

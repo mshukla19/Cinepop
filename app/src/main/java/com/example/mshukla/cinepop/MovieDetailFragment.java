@@ -38,21 +38,21 @@ public class MovieDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
+        if(arguments != null) {
+            movie = arguments.getParcelable(Constants.MOVIE_BUNDLE_KEY);
+            Glide.with(this).load(Constants.IMAGE_URL + movie.getPosterPath())
+                    .placeholder(R.drawable.movie_placeholder)
+                    .crossFade()
+                    .into(mMoviePoster);
 
-        movie = getActivity().getIntent().getParcelableExtra(Constants.MOVIE_BUNDLE_KEY);
-
-        Glide.with(this).load(Constants.IMAGE_URL + movie.getPosterPath())
-                .placeholder(R.drawable.movie_placeholder)
-                .crossFade()
-                .into(mMoviePoster);
-
-        title.setText(movie.getTitle());
-        releaseDate.setText(movie.getReleaseDate());
-        voteAverage.setText(movie.getVoteAverage().toString());
-        overview.setText(movie.getOverview());
-
+            title.setText(movie.getTitle());
+            releaseDate.setText(movie.getReleaseDate());
+            voteAverage.setText(movie.getVoteAverage().toString());
+            overview.setText(movie.getOverview());
+        }
 
         return view;
     }
