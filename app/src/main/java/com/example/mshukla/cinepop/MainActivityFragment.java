@@ -66,7 +66,7 @@ public class MainActivityFragment extends Fragment {
                     view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
                 int gridWidth = mMoviesGrid.getWidth();
-                int spanCount = gridWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
+                 int spanCount = gridWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
                 actualWidth = gridWidth / spanCount;
                 RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), spanCount);
                 mMoviesGrid.setLayoutManager(mLayoutManager);

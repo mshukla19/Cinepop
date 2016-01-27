@@ -4,10 +4,11 @@ package com.example.mshukla.cinepop.Model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by manas on 12/17/15.
@@ -261,6 +262,7 @@ public class Movie implements Parcelable{
     // http://stackoverflow.com/questions/3323074/android-difference-between-parcelable-and-serializable
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
         parcel.writeString(posterPath);
         parcel.writeString(overview);
         parcel.writeString(releaseDate);
@@ -276,6 +278,7 @@ public class Movie implements Parcelable{
         @Override
         public Movie createFromParcel(Parcel source) {
             Movie movie = new Movie();
+            movie.setId(source.readInt());
             movie.setPosterPath(source.readString());
             movie.setOverview(source.readString());
             movie.setReleaseDate(source.readString());
