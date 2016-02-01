@@ -1,11 +1,14 @@
 package com.example.mshukla.cinepop;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,8 +16,12 @@ import com.bumptech.glide.Glide;
 import com.example.mshukla.cinepop.Api.RestClient;
 import com.example.mshukla.cinepop.Model.Movie;
 import com.example.mshukla.cinepop.Model.ReviewResults;
+import com.example.mshukla.cinepop.Model.Trailer;
 import com.example.mshukla.cinepop.Model.TrailerResults;
 import com.example.mshukla.cinepop.Util.Constants;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,7 +33,7 @@ import retrofit.Retrofit;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements View.OnClickListener{
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
@@ -41,6 +48,13 @@ public class MovieDetailFragment extends Fragment {
     TextView overview;
     @Bind(R.id.movie_poster)
     ImageView mMoviePoster;
+
+    @Bind(R.id.trailers_container)
+    HorizontalScrollView mTrailersContainer;
+    @Bind(R.id.trailers)
+    ViewGroup mTrailersLayout;
+    @Bind(R.id.trailers_header)
+    TextView mTrailersHeader;
 
     public MovieDetailFragment() {
     }
@@ -69,12 +83,31 @@ public class MovieDetailFragment extends Fragment {
         return view;
     }
     private void addTrailers(Movie movie) {
+        final List<Trailer> trailers = new ArrayList<>();
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
         Call<TrailerResults> trailerResultsCall = RestClient.getApiService().
                 getTrailersResults(movie.getId(), BuildConfig.API_KEY);
         trailerResultsCall.enqueue(new Callback<TrailerResults>() {
             @Override
             public void onResponse(Response<TrailerResults> response, Retrofit retrofit) {
-                Log.d(LOG_TAG, response.body().getResults().get(0).toString());
+                trailers.addAll(response.body().getResults());
+                if(trailers.size() > 0) {
+                    mTrailersContainer.setVisibility(View.VISIBLE);
+                    mTrailersHeader.setVisibility(View.VISIBLE);
+                    for (Trailer trailer : trailers) {
+                        String thumbnailUrl = Trailer.getThumbnailUrl(trailer);
+                        String videoUrl = Trailer.getVideoUrl(trailer);
+                        ViewGroup thumbnailImage = (ViewGroup) inflater.inflate(R.layout.trailer,mTrailersContainer, false);
+                        ImageView thumbnail = (ImageView) thumbnailImage.findViewById(R.id.trailer_thumb);
+                        Glide.with(getContext())
+                                .load(thumbnailUrl)
+                                .crossFade()
+                                .into(thumbnail);
+                        thumbnail.setTag(videoUrl);
+                        thumbnail.setOnClickListener(MovieDetailFragment.this);
+                        mTrailersLayout.addView(thumbnailImage);
+                    }
+                }
             }
 
             @Override
@@ -97,5 +130,15 @@ public class MovieDetailFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void onClick(View view) {
+        int id = view.getId();
+        switch (id) {
+            case R.id.trailer_thumb: String videoUrl = (String) view.getTag();
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(videoUrl));
+                startActivity(intent);
+        }
     }
 }

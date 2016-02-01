@@ -12,4 +12,7 @@ public final class Constants {
     public final static int DESIRED_MOVIE_POSTER_WIDTH = 300;
     public final static double TMDB_RESIZE_RATIO = 0.6678700361;
 
+    public final static String VIDEO_TYPE_TRAILER = "Trailer";
+    public final static String VIDEO_SITE_YOUTUBE = "YouTube";
+
 }
