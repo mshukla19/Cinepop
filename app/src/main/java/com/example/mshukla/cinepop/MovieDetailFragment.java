@@ -4,10 +4,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.mshukla.cinepop.Api.RestClient;
 import com.example.mshukla.cinepop.Model.Movie;
+import com.example.mshukla.cinepop.Model.Review;
 import com.example.mshukla.cinepop.Model.ReviewResults;
 import com.example.mshukla.cinepop.Model.Trailer;
 import com.example.mshukla.cinepop.Model.TrailerResults;
@@ -56,6 +58,16 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     @Bind(R.id.trailers_header)
     TextView mTrailersHeader;
 
+    @Bind(R.id.reviews_header)
+    TextView mReviewsHeader;
+    @Bind(R.id.reviews)
+    ViewGroup mReviewsLayout;
+
+    @Bind(R.id.favourite)
+    Button mFavouriteButton;
+
+    Toolbar mToolbar;
+
     public MovieDetailFragment() {
     }
 
@@ -66,7 +78,10 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
         ButterKnife.bind(this, view);
         if(arguments != null) {
+            setupToolbar();
             movie = arguments.getParcelable(Constants.MOVIE_BUNDLE_KEY);
+            if(mToolbar!=null)
+                mToolbar.setTitle(movie.getTitle());
             Glide.with(this).load(Constants.IMAGE_URL + movie.getPosterPath())
                     .placeholder(R.drawable.movie_placeholder)
                     .crossFade()
@@ -78,6 +93,12 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
             overview.setText(movie.getOverview());
             addTrailers(movie);
             addReviews(movie);
+            mFavouriteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    
+                }
+            });
         }
 
         return view;
@@ -95,17 +116,19 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
                     mTrailersContainer.setVisibility(View.VISIBLE);
                     mTrailersHeader.setVisibility(View.VISIBLE);
                     for (Trailer trailer : trailers) {
-                        String thumbnailUrl = Trailer.getThumbnailUrl(trailer);
-                        String videoUrl = Trailer.getVideoUrl(trailer);
-                        ViewGroup thumbnailImage = (ViewGroup) inflater.inflate(R.layout.trailer,mTrailersContainer, false);
-                        ImageView thumbnail = (ImageView) thumbnailImage.findViewById(R.id.trailer_thumb);
-                        Glide.with(getContext())
-                                .load(thumbnailUrl)
-                                .crossFade()
-                                .into(thumbnail);
-                        thumbnail.setTag(videoUrl);
-                        thumbnail.setOnClickListener(MovieDetailFragment.this);
-                        mTrailersLayout.addView(thumbnailImage);
+                        if(trailer.getType().equals(Constants.VIDEO_TYPE_TRAILER) && trailer.getSite().equals(Constants.VIDEO_SITE_YOUTUBE)) {
+                            String thumbnailUrl = Trailer.getThumbnailUrl(trailer);
+                            String videoUrl = Trailer.getVideoUrl(trailer);
+                            ViewGroup thumbnailImage = (ViewGroup) inflater.inflate(R.layout.trailer, mTrailersContainer, false);
+                            ImageView thumbnail = (ImageView) thumbnailImage.findViewById(R.id.trailer_thumb);
+                            Glide.with(getContext())
+                                    .load(thumbnailUrl)
+                                    .crossFade()
+                                    .into(thumbnail);
+                            thumbnail.setTag(videoUrl);
+                            thumbnail.setOnClickListener(MovieDetailFragment.this);
+                            mTrailersLayout.addView(thumbnailImage);
+                        }
                     }
                 }
             }
@@ -117,12 +140,26 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
         });
     }
     private void addReviews(Movie movie) {
+        final List<Review> reviews = new ArrayList<>();
+        final LayoutInflater inflater = getActivity().getLayoutInflater();
         Call<ReviewResults> reviewResultsCall = RestClient.getApiService().
                 getReviewsResults(movie.getId(), BuildConfig.API_KEY);
         reviewResultsCall.enqueue(new Callback<ReviewResults>() {
             @Override
             public void onResponse(Response<ReviewResults> response, Retrofit retrofit) {
-                Log.d(LOG_TAG, response.body().getResults().toString());
+                reviews.addAll(response.body().getResults());
+                if(reviews.size() != 0) {
+                    mReviewsHeader.setVisibility(View.VISIBLE);
+                    mReviewsLayout.setVisibility(View.VISIBLE);
+                    for(Review r : reviews) {
+                        ViewGroup review = (ViewGroup) inflater.inflate(R.layout.review_item, mReviewsLayout, false);
+                        TextView reviewAuthor = (TextView) review.findViewById(R.id.review_author);
+                        TextView reviewContent = (TextView) review.findViewById(R.id.review_content);
+                        reviewAuthor.setText(r.getAuthor());
+                        reviewContent.setText(r.getContent());
+                        mReviewsLayout.addView(review);
+                    }
+                }
             }
 
             @Override
@@ -130,6 +167,13 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
 
             }
         });
+    }
+
+    private void setupToolbar() {
+        if (getActivity() instanceof MovieDetailActivity) {
+            MovieDetailActivity activity = ((MovieDetailActivity) getActivity());
+            mToolbar = activity.getToolbar();
+        }
     }
 
     @Override

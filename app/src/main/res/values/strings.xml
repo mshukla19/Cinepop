@@ -21,4 +21,5 @@
         "seams, divides space, and indicates moving parts.\n\n"
     </string>
     <string name="title_activity_movie_detail">MovieDetail</string>
+    <string name="mark_favourite">Mark as Favourite</string>
 </resources>

@@ -4,7 +4,6 @@ package com.example.mshukla.cinepop.Model;
  * Created by manas on 1/13/16.
  */
 
-import com.example.mshukla.cinepop.Util.Constants;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -159,20 +158,11 @@ public class Trailer {
     }
 
     public static String getThumbnailUrl(Trailer trailer) {
-        if(trailer.getSite().equals(Constants.VIDEO_SITE_YOUTUBE) && trailer.getType().equals(Constants.VIDEO_TYPE_TRAILER)) {
             return String.format("http://img.youtube.com/vi/%1$s/0.jpg", trailer.getKey());
-        }
-        else {
-            return null;
-        }
     }
 
     public static String getVideoUrl(Trailer trailer) {
-        if (trailer.getSite().equals(Constants.VIDEO_SITE_YOUTUBE) && trailer.getType().equals(Constants.VIDEO_TYPE_TRAILER)) {
             return String.format("http://www.youtube.com/watch?v=%1$s", trailer.getKey());
-        } else {
-            return null;
-        }
     }
 
 }

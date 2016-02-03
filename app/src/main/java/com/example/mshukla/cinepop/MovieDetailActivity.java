@@ -9,14 +9,15 @@ import com.example.mshukla.cinepop.Util.Constants;
 public class MovieDetailActivity extends AppCompatActivity {
 
     private String MOVIE_DETAIL_FRAG_TAG = "detailFragment";
+    Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -35,6 +36,10 @@ public class MovieDetailActivity extends AppCompatActivity {
                     .commit();
         }
 
+    }
+
+    public Toolbar getToolbar() {
+        return mToolbar;
     }
 
 }
