@@ -9,7 +9,12 @@
         app:showAsAction="never" />
     <item
         android:id="@+id/sort_rating"
-        android:orderInCategory="100"
+        android:orderInCategory="101"
         android:title="@string/sort_rating"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/favourite"
+        android:orderInCategory="102"
+        android:title="@string/show_favourites"
         app:showAsAction="never" />
 </menu>

@@ -4,10 +4,13 @@ package com.example.mshukla.cinepop.Model;
  * Created by manas on 1/13/16.
  */
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Trailer {
+public class Trailer implements Parcelable{
 
     @SerializedName("id")
     @Expose
@@ -165,4 +168,39 @@ public class Trailer {
             return String.format("http://www.youtube.com/watch?v=%1$s", trailer.getKey());
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id);
+        parcel.writeString(name);
+        parcel.writeString(key);
+        parcel.writeString(site);
+        parcel.writeString(type);
+        parcel.writeString(iso6391);
+        parcel.writeInt(size);
+
+    }
+    public static final Creator<Trailer> CREATOR = new Creator<Trailer>() {
+        @Override
+        public Trailer[] newArray(int size) {
+            return new Trailer[size];
+        }
+
+        @Override
+        public Trailer createFromParcel(Parcel source) {
+            Trailer trailer = new Trailer();
+            trailer.setId(source.readString());
+            trailer.setName(source.readString());
+            trailer.setKey(source.readString());
+            trailer.setSite(source.readString());
+            trailer.setType(source.readString());
+            trailer.setIso6391(source.readString());
+            trailer.setSize(source.readInt());
+            return trailer;
+        }
+    };
 }

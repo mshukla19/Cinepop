@@ -20,10 +20,10 @@ import com.example.mshukla.cinepop.Model.MovieResults;
 import com.example.mshukla.cinepop.Util.Constants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import info.quantumflux.model.query.Select;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -37,15 +37,21 @@ public class MainActivityFragment extends Fragment {
     @Bind(R.id.movie_grid_view)
     RecyclerView mMoviesGrid;
     MoviesAdapter moviesAdapter;
-    private List<Movie> movies;
+    private ArrayList<Movie> movies;
     private int actualWidth;
     private String mSortCriteria;
     public MainActivityFragment() {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList(Constants.MOVIE_BUNDLE_KEY, movies);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
         mMoviesGrid.setHasFixedSize(true);
@@ -70,8 +76,11 @@ public class MainActivityFragment extends Fragment {
                 actualWidth = gridWidth / spanCount;
                 RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), spanCount);
                 mMoviesGrid.setLayoutManager(mLayoutManager);
-                movies = new ArrayList<>();
-
+                if(savedInstanceState!=null) {
+                    movies = savedInstanceState.getParcelableArrayList(Constants.MOVIE_BUNDLE_KEY);
+                } else {
+                    movies = new ArrayList<>();
+                }
                 moviesAdapter = new MoviesAdapter(getContext(), movies, actualWidth,
                         (MoviesAdapter.ViewHolder.ClickListener) getActivity());
 
@@ -85,6 +94,12 @@ public class MainActivityFragment extends Fragment {
 
     private void loadMovies() {
         setSortCriteria();
+        if(mSortCriteria.equals(Constants.SORT_FAVOURITES)) {
+            movies.clear();
+            movies.addAll(Select.from(Movie.class).queryAsList());
+            moviesAdapter.notifyDataSetChanged();
+            return;
+        }
         Call<MovieResults> movieResultsCall = RestClient.getApiService().
                 getMovieResults(BuildConfig.API_KEY, mSortCriteria);
         movieResultsCall.enqueue(new Callback<MovieResults>() {
@@ -113,6 +128,8 @@ public class MainActivityFragment extends Fragment {
             case R.id.sort_popularity: editor.putString(Constants.SORT_CRITERIA,Constants.SORT_BY_POPULARITY);
                 break;
             case R.id.sort_rating: editor.putString(Constants.SORT_CRITERIA, Constants.SORT_BY_RATING);
+                break;
+            case R.id.favourite: editor.putString(Constants.SORT_CRITERIA, Constants.SORT_FAVOURITES);
                 break;
             default: editor.putString(Constants.SORT_CRITERIA,Constants.SORT_BY_POPULARITY);
                 break;

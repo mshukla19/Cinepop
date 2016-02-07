@@ -7,13 +7,13 @@ import android.os.Parcelable;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.List;
+import info.quantumflux.model.annotation.Column.PrimaryKey;
+import info.quantumflux.model.annotation.Table;
 
 /**
  * Created by manas on 12/17/15.
  */
-
+@Table
 public class Movie implements Parcelable{
 
     @SerializedName("poster_path")
@@ -28,11 +28,12 @@ public class Movie implements Parcelable{
     @SerializedName("release_date")
     @Expose
     private String releaseDate;
-    @SerializedName("genre_ids")
-    @Expose
-    private List<Integer> genreIds = new ArrayList<Integer>();
+//    @SerializedName("genre_ids")
+//    @Expose
+//    private List<Integer> genreIds = new ArrayList<Integer>();
     @SerializedName("id")
     @Expose
+    @PrimaryKey(autoIncrement = false)
     private Integer id;
     @SerializedName("original_title")
     @Expose
@@ -115,19 +116,19 @@ public class Movie implements Parcelable{
         this.releaseDate = releaseDate;
     }
 
-    /**
-     * @return The genreIds
-     */
-    public List<Integer> getGenreIds() {
-        return genreIds;
-    }
-
-    /**
-     * @param genreIds The genre_ids
-     */
-    public void setGenreIds(List<Integer> genreIds) {
-        this.genreIds = genreIds;
-    }
+//    /**
+//     * @return The genreIds
+//     */
+//    public List<Integer> getGenreIds() {
+//        return genreIds;
+//    }
+//
+//    /**
+//     * @param genreIds The genre_ids
+//     */
+//    public void setGenreIds(List<Integer> genreIds) {
+//        this.genreIds = genreIds;
+//    }
 
     /**
      * @return The id

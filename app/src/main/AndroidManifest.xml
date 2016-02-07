@@ -5,11 +5,13 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".CinepopApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        >
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -29,6 +31,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.mshukla.cinepop.MainActivity" />
         </activity>
+
+        <meta-data android:name="AUTHORITY" android:value="com.example.mshukla.cinepop" />
+        <meta-data android:name="DATABASE_NAME" android:value="Cinepop.sqlite" />
+        <meta-data android:name="DATABASE_VERSION" android:value="1" />
+        <meta-data android:name="PACKAGE_NAME" android:value="com.example.mshukla.cinepop" />
+        <meta-data android:name="QUERY_LOG" android:value="true" /> <!-- Optional -->
+
+        <provider
+            android:name="info.quantumflux.provider.QuantumFluxContentProvider"
+            android:authorities="com.example.mshukla.cinepop"
+            android:exported="false" />
     </application>
 
 </manifest>
