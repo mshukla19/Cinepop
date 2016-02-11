@@ -80,6 +80,9 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     boolean mFavourite = false;
     private ShareActionProvider mShareActionProvider;
 
+    Call<TrailerResults> trailerResultsCall;
+    Call<ReviewResults> reviewResultsCall;
+
     public MovieDetailFragment() {
     }
 
@@ -154,10 +157,11 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
             mFavouriteButton.setText(R.string.remove_favourite);
             mFavourite = true;
         }
+
     }
 
     private void addTrailers(Movie movie) {
-        final Call<TrailerResults> trailerResultsCall = RestClient.getApiService().
+        trailerResultsCall = RestClient.getApiService().
                 getTrailersResults(movie.getId(), BuildConfig.API_KEY);
         trailerResultsCall.enqueue(new Callback<TrailerResults>() {
             @Override
@@ -201,7 +205,7 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
         }
     }
     private void addReviews(Movie movie) {
-        final Call<ReviewResults> reviewResultsCall = RestClient.getApiService().
+        reviewResultsCall = RestClient.getApiService().
                 getReviewsResults(movie.getId(), BuildConfig.API_KEY);
         reviewResultsCall.enqueue(new Callback<ReviewResults>() {
             @Override
@@ -278,4 +282,14 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
         shareIntent.putExtra(Intent.EXTRA_TEXT, Trailer.getVideoUrl(trailers.get(0)));
         return shareIntent;
     }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if(trailerResultsCall!=null)
+            trailerResultsCall.cancel();
+        if(reviewResultsCall!=null)
+            reviewResultsCall.cancel();
+    }
+
 }

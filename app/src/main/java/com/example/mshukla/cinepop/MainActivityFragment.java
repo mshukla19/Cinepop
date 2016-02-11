@@ -72,11 +72,11 @@ public class MainActivityFragment extends Fragment {
                     view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                 }
                 int gridWidth = mMoviesGrid.getWidth();
-                 int spanCount = gridWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
+                int spanCount = gridWidth / Constants.DESIRED_MOVIE_POSTER_WIDTH;
                 actualWidth = gridWidth / spanCount;
                 RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getContext(), spanCount);
                 mMoviesGrid.setLayoutManager(mLayoutManager);
-                if(savedInstanceState!=null) {
+                if (savedInstanceState != null) {
                     movies = savedInstanceState.getParcelableArrayList(Constants.MOVIE_BUNDLE_KEY);
                 } else {
                     movies = new ArrayList<>();
@@ -146,4 +146,6 @@ public class MainActivityFragment extends Fragment {
             mSortCriteria = sortCriteria;
         return mSortCriteria;
     }
+
+
 }
