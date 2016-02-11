@@ -80,7 +80,6 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     boolean mFavourite = false;
     private ShareActionProvider mShareActionProvider;
 
-
     public MovieDetailFragment() {
     }
 
@@ -93,11 +92,9 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         Bundle arguments = getArguments();
-        View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
-        ButterKnife.bind(this, view);
         if(savedInstanceState!=null) {
             movie = savedInstanceState.getParcelable(Constants.MOVIE_BUNDLE_KEY);
             trailers = savedInstanceState.getParcelableArrayList(Constants.TRAILER_BUNDLE_KEY);
@@ -141,6 +138,13 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
                 }
             });
         }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
+        ButterKnife.bind(this, view);
 
         return view;
     }
@@ -171,8 +175,8 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     }
 
     private void updateTrailers() {
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-        if(trailers.size() > 0) {
+        if(trailers!=null && trailers.size() > 0) {
+            final LayoutInflater inflater = getActivity().getLayoutInflater();
             mTrailersContainer.setVisibility(View.VISIBLE);
             mTrailersHeader.setVisibility(View.VISIBLE);
             for (Trailer trailer : trailers) {
@@ -215,8 +219,8 @@ public class MovieDetailFragment extends Fragment implements View.OnClickListene
     }
 
     private void updateReviews() {
-        final LayoutInflater inflater = getActivity().getLayoutInflater();
-        if(reviews.size() != 0) {
+        if(reviews!=null && reviews.size() != 0) {
+            final LayoutInflater inflater = getActivity().getLayoutInflater();
             mReviewsHeader.setVisibility(View.VISIBLE);
             mReviewsLayout.setVisibility(View.VISIBLE);
             for(Review r : reviews) {
